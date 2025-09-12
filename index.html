@@ -137,8 +137,7 @@ async function loadStatus(){
 loadStatus(); setInterval(loadStatus, 10000);
 
 /* ==== Chart.js Logic ==== */
-// 👉 เปลี่ยนเป็น Channel ID ของคุณ
-const CHANNEL_ID = "YOUR_CHANNEL_ID";
+const CHANNEL_ID = "3069958";  // ✅ ใส่ Channel ID ของคุณแล้ว
 const RESULTS = 50; // จำนวนข้อมูลย้อนหลัง
 const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${RESULTS}`;
 
