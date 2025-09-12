@@ -22,7 +22,7 @@ body {
 }
 
 /* Header */
-header.header {
+header {
   text-align: center;
   padding: 2rem 1rem;
   background: linear-gradient(135deg, #2563eb, #1e40af);
@@ -30,11 +30,12 @@ header.header {
   border-bottom-left-radius: 20px;
   border-bottom-right-radius: 20px;
 }
-header.header h1 {
+header h1 {
   margin: 0;
   font-size: 2rem;
+  font-weight: 700;
 }
-header.header p {
+header p {
   margin: .5rem 0 0;
   opacity: .9;
 }
@@ -49,12 +50,34 @@ header.header p {
   background: var(--card-bg);
   padding: 1.5rem;
   border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.05);
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
   margin-bottom: 1.5rem;
+  transition: transform .2s;
+}
+.card:hover {
+  transform: translateY(-2px);
 }
 h2 {
   margin-top: 0;
   color: var(--pri);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+h3 {
+  margin: 1rem 0 .5rem;
+  color: var(--fg);
+  font-size: 1.1rem;
+}
+
+/* Rows & Blocks */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+.block {
+  flex: 1;
 }
 
 /* Buttons */
@@ -64,16 +87,20 @@ button {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
-  transition: all .2s ease;
+  transition: all .25s ease;
 }
 button.blue { background: var(--pri); color:#fff; }
 button.blue:hover { background: var(--pri-hover); }
 button.green { background: var(--success); color:#fff; }
+button.green.active { box-shadow: 0 0 12px var(--success); }
 button.red { background: var(--danger); color:#fff; }
+button.red.active { box-shadow: 0 0 12px var(--danger); }
 
 /* Status */
 .status b.on { color: var(--success); }
 .status b.off { color: var(--danger); }
+#ps.on { color: var(--success); font-weight: 600; }
+#ps.off { color: var(--danger); font-weight: 600; }
 
 /* Switch */
 .switch {
@@ -90,3 +117,11 @@ button.red { background: var(--danger); color:#fff; }
 }
 input:checked + .slider { background: var(--success); }
 input:checked + .slider:before { transform: translateX(22px); }
+
+/* Chart.js overrides */
+canvas {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.05);
+  padding: 10px;
+}
