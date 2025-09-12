@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TalkBack Irrigation</title>
-  <!-- ✅ แก้ path CSS -->
-  <link rel="stylesheet" href="styles.css?v=3">
+  <title>TakunchanGarden - ระบบควบคุมรดน้ำ</title>
+  <!-- ✅ ใช้ CSS -->
+  <link rel="stylesheet" href="styles.css?v=5">
 </head>
 <body>
   <!-- Header -->
-  <header>
-    <h1>🌱 ระบบควบคุมรดน้ำอัตโนมัติ</h1>
-    <p>ESP32 + ThingSpeak TalkBack</p>
+  <header class="header">
+    <h1>🌱 TakunchanGarden</h1>
+    <p>ระบบควบคุมรดน้ำอัตโนมัติด้วย ESP32 + ThingSpeak TalkBack</p>
   </header>
 
   <main class="container">
     <!-- Control Card -->
     <section class="card">
-      <h2>ควบคุมรดน้ำ (TalkBack)</h2>
+      <h2>⚙️ ควบคุมรดน้ำ</h2>
 
       <div class="row">
         <label class="switch">
@@ -27,12 +27,12 @@
       </div>
 
       <div id="manualRow" class="row hidden">
-        <button id="onBtn" class="btn green">เปิดปั๊ม</button>
-        <button id="offBtn" class="btn red">ปิดปั๊ม</button>
+        <button id="onBtn" class="btn green">🚰 เปิดปั๊ม</button>
+        <button id="offBtn" class="btn red">✖ ปิดปั๊ม</button>
       </div>
 
       <div class="row space-between">
-        <div>
+        <div class="block">
           <label>Threshold</label>
           <div class="row">
             <input id="thL" type="range" min="10" max="90" value="35"><span id="thLV">35%</span>
@@ -40,23 +40,23 @@
           <div class="row">
             <input id="thH" type="range" min="10" max="90" value="45"><span id="thHV">45%</span>
           </div>
-          <button id="saveTh" class="btn blue">บันทึก THRESH</button>
+          <button id="saveTh" class="btn blue">💾 บันทึก THRESH</button>
         </div>
-        <div>
+        <div class="block">
           <label>Max ON (min)</label>
           <input id="maxOn" type="number" min="0" value="10" style="width:90px">
-          <button id="saveMax" class="btn blue">ตั้ง MAXON</button>
+          <button id="saveMax" class="btn blue">⏱ ตั้ง MAXON</button>
         </div>
       </div>
     </section>
 
     <!-- Status Card -->
     <section class="card">
-      <h2>สถานะอุปกรณ์</h2>
+      <h2>📊 สถานะอุปกรณ์</h2>
       <p>💧 ความชื้น: <b id="mo">-</b>%</p>
       <p>🚰 ปั๊ม: <b id="ps" class="off">-</b></p>
       <p>⚙️ โหมด (จากอุปกรณ์): <b id="md">-</b></p>
-      <p class="sub">⏱ อัปเดตทุก ~10 วินาที</p>
+      <p class="sub">🔄 อัปเดตทุก ~10 วินาที</p>
     </section>
   </main>
 
