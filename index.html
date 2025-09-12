@@ -6,6 +6,8 @@
   <title>TakunchanGarden - ระบบควบคุมรดน้ำ</title>
   <!-- ✅ ใช้ CSS -->
   <link rel="stylesheet" href="styles.css?v=5">
+  <!-- ✅ เพิ่ม Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <!-- Header -->
@@ -57,6 +59,19 @@
       <p>🚰 ปั๊ม: <b id="ps" class="off">-</b></p>
       <p>⚙️ โหมด (จากอุปกรณ์): <b id="md">-</b></p>
       <p class="sub">🔄 อัปเดตทุก ~10 วินาที</p>
+    </section>
+
+    <!-- Charts Card -->
+    <section class="card">
+      <h2>📈 กราฟย้อนหลัง</h2>
+      <h3>💧 ความชื้น (%)</h3>
+      <canvas id="moistChart" height="200"></canvas>
+
+      <h3>🚰 ปั๊ม (ON/OFF)</h3>
+      <canvas id="pumpChart" height="200"></canvas>
+
+      <h3>⚙️ โหมด (AUTO/MANUAL)</h3>
+      <canvas id="modeChart" height="200"></canvas>
     </section>
   </main>
 
@@ -120,6 +135,42 @@ async function loadStatus(){
   }catch(e){}
 }
 loadStatus(); setInterval(loadStatus, 10000);
+
+/* ==== Chart.js Logic ==== */
+// 👉 เปลี่ยนเป็น Channel ID ของคุณ
+const CHANNEL_ID = "YOUR_CHANNEL_ID";
+const RESULTS = 50; // จำนวนข้อมูลย้อนหลัง
+const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${RESULTS}`;
+
+async function loadHistory(){
+  const r = await fetch(TS_URL);
+  const data = await r.json();
+  const labels = data.feeds.map(f => new Date(f.created_at).toLocaleTimeString());
+  const moist = data.feeds.map(f => parseFloat(f.field1));
+  const pump  = data.feeds.map(f => parseInt(f.field2));
+  const mode  = data.feeds.map(f => parseInt(f.field3));
+
+  new Chart(document.getElementById('moistChart'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Moisture (%)', data: moist, borderColor:'#00aaff', borderWidth:2, fill:false }] },
+    options: { responsive:true, scales:{ y:{ beginAtZero:true, max:100 } } }
+  });
+
+  new Chart(document.getElementById('pumpChart'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Pump', data: pump, borderColor:'#ff0000', borderWidth:2, stepped:true }] },
+    options: { responsive:true, scales:{ y:{ beginAtZero:true, max:1, ticks:{ stepSize:1 } } } }
+  });
+
+  new Chart(document.getElementById('modeChart'), {
+    type: 'line',
+    data: { labels, datasets: [{ label:'Mode', data: mode, borderColor:'#00cc44', borderWidth:2, stepped:true }] },
+    options: { responsive:true, scales:{ y:{ beginAtZero:true, max:1, ticks:{ stepSize:1 } } } }
+  });
+}
+
+loadHistory();
+setInterval(loadHistory, 30000); // อัปเดตกราฟทุก 30 วิ
 </script>
 </body>
 </html>
