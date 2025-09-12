@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>TalkBack Irrigation</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<main class="card">
+  <h1>ควบคุมรดน้ำ (TalkBack)</h1>
+
+  <section class="row">
+    <label class="switch">
+      <input id="modeToggle" type="checkbox"><span class="slider"></span>
+    </label>
+    <div>โหมด: <b id="modeLabel">AUTO</b></div>
+  </section>
+
+  <section id="manualRow" class="row hidden">
+    <button id="onBtn">เปิดปั๊ม</button>
+    <button id="offBtn" class="outline">ปิดปั๊ม</button>
+  </section>
+
+  <section class="row">
+    <div class="grow">
+      <label>Threshold</label>
+      <div class="row">
+        <input id="thL" type="range" min="10" max="90" value="35"><span id="thLV">35%</span>
+      </div>
+      <div class="row">
+        <input id="thH" type="range" min="10" max="90" value="45"><span id="thHV">45%</span>
+      </div>
+      <button id="saveTh">บันทึก THRESH</button>
+    </div>
+    <div>
+      <label>Max ON (min)</label>
+      <input id="maxOn" type="number" min="0" value="10" style="width:90px">
+      <button id="saveMax">ตั้ง MAXON</button>
+    </div>
+  </section>
+
+  <section class="status">
+    <h2>สถานะ</h2>
+    <div>ความชื้น: <b id="mo">-</b>%</div>
+    <div>ปั๊ม: <b id="ps">-</b></div>
+    <div>โหมด (จากอุปกรณ์): <b id="md">-</b></div>
+    <div class="sub">อัปเดตทุก ~10 วินาที</div>
+  </section>
+</main>
+
+<script>
+const modeToggle = document.getElementById('modeToggle');
+const manualRow  = document.getElementById('manualRow');
+const modeLabel  = document.getElementById('modeLabel');
+const onBtn = document.getElementById('onBtn');
+const offBtn = document.getElementById('offBtn');
+const thL = document.getElementById('thL');
+const thH = document.getElementById('thH');
+const thLV = document.getElementById('thLV');
+const thHV = document.getElementById('thHV');
+const saveTh = document.getElementById('saveTh');
+const maxOn = document.getElementById('maxOn');
+const saveMax = document.getElementById('saveMax');
+
+const mo = document.getElementById('mo');
+const ps = document.getElementById('ps');
+const md = document.getElementById('md');
+
+function applyMode(isAuto){
+  modeLabel.textContent = isAuto ? 'AUTO' : 'MANUAL';
+  manualRow.classList.toggle('hidden', isAuto);
+  modeToggle.checked = isAuto;
+}
+
+async function sendCmd(c){
+  await fetch('/api/cmd?c=' + encodeURIComponent(c));
+}
+
+modeToggle.addEventListener('change', async (e)=>{
+  const isAuto = e.target.checked;
+  await sendCmd('MODE:' + (isAuto ? 'AUTO' : 'MANUAL'));
+  applyMode(isAuto);
+});
+
+onBtn.addEventListener('click', ()=> sendCmd('PUMP:ON'));
+offBtn.addEventListener('click', ()=> sendCmd('PUMP:OFF'));
+
+thL.addEventListener('input', ()=> thLV.textContent = thL.value + '%');
+thH.addEventListener('input', ()=> thHV.textContent = thH.value + '%');
+saveTh.addEventListener('click', ()=> sendCmd(`THRESH:${thL.value}:${thH.value}`));
+saveMax.addEventListener('click', ()=> sendCmd(`MAXON:${maxOn.value}`));
+
+async function loadStatus(){
+  try{
+    const r = await fetch('/api/status');
+    const s = await r.json();
+    if (s.moisture_percent != null) mo.textContent = s.moisture_percent;
+    if (s.pump_state != null) ps.textContent = s.pump_state ? 'ON' : 'OFF';
+    if (s.mode != null){
+      const isAuto = Number(s.mode) === 1;
+      md.textContent = isAuto ? 'AUTO' : 'MANUAL';
+      applyMode(isAuto);
+    }
+  }catch(e){}
+}
+loadStatus(); setInterval(loadStatus, 10000);
+</script>
+</body>
+</html>
