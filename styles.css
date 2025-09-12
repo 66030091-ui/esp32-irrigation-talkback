@@ -1,127 +1,22 @@
-:root {
-  --fg:#0d1321;
-  --bg:#f4f7fa;
-  --muted:#6b7280;
-  --pri:#2563eb;
-  --pri-hover:#1d4ed8;
-  --success:#16a34a;
-  --danger:#dc2626;
-  --card-bg:#ffffff;
-}
-
-* {
-  box-sizing: border-box;
-  font-family: "Prompt", system-ui, Segoe UI, Roboto, sans-serif;
-}
-
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--fg);
-  line-height: 1.6;
-}
-
-/* Header */
-header {
-  text-align: center;
-  padding: 2rem 1rem;
-  background: linear-gradient(135deg, #2563eb, #1e40af);
-  color: white;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-}
-header h1 {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-}
-header p {
-  margin: .5rem 0 0;
-  opacity: .9;
-}
-
-/* Layout */
-.container {
-  max-width: 850px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-}
-.card {
-  background: var(--card-bg);
-  padding: 1.5rem;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0,0,0,.08);
-  margin-bottom: 1.5rem;
-  transition: transform .2s;
-}
-.card:hover {
-  transform: translateY(-2px);
-}
-h2 {
-  margin-top: 0;
-  color: var(--pri);
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-h3 {
-  margin: 1rem 0 .5rem;
-  color: var(--fg);
-  font-size: 1.1rem;
-}
-
-/* Rows & Blocks */
-.row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 10px 0;
-}
-.block {
-  flex: 1;
-}
-
-/* Buttons */
-button {
-  padding: .6rem 1.2rem;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all .25s ease;
-}
-button.blue { background: var(--pri); color:#fff; }
-button.blue:hover { background: var(--pri-hover); }
-button.green { background: var(--success); color:#fff; }
-button.green.active { box-shadow: 0 0 12px var(--success); }
-button.red { background: var(--danger); color:#fff; }
-button.red.active { box-shadow: 0 0 12px var(--danger); }
-
-/* Status */
-.status b.on { color: var(--success); }
-.status b.off { color: var(--danger); }
-#ps.on { color: var(--success); font-weight: 600; }
-#ps.off { color: var(--danger); font-weight: 600; }
-
-/* Switch */
-.switch {
-  position: relative; display: inline-block; width: 52px; height: 30px;
-}
-.switch input { display: none; }
-.slider {
-  position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-  background: #d1d5db; transition: .25s; border-radius: 999px;
-}
-.slider:before {
-  position: absolute; content: ""; height: 22px; width: 22px; left: 4px; top: 4px;
-  background: white; transition: .25s; border-radius: 999px;
-}
-input:checked + .slider { background: var(--success); }
-input:checked + .slider:before { transform: translateX(22px); }
-
-/* Chart.js overrides */
-canvas {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.05);
-  padding: 10px;
-}
+:root { --fg:#0d1321; --bg:#f6f8fb; --muted:#6b7280; --pri:#2563eb; }
+*{ box-sizing:border-box; font-family:system-ui,Segoe UI,Roboto; }
+body{ margin:0; background:var(--bg); color:var(--fg); }
+main.card{ max-width:720px; margin:4rem auto; background:#fff; padding:1.5rem; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.08); }
+h1{ margin:0 0 .75rem 0; }
+h2{ margin:1rem 0 .5rem 0; }
+.row{ display:flex; align-items:center; gap:1rem; margin:.75rem 0; }
+.row .grow{ flex:1; }
+.hidden{ display:none; }
+button{ padding:.6rem 1rem; border:0; border-radius:10px; background:var(--pri); color:#fff; cursor:pointer; font-weight:600; }
+button.outline{ background:#fff; color:var(--pri); border:2px solid var(--pri); }
+label{ font-weight:600; }
+.sub{ font-size:.9rem; color:var(--muted); }
+input[type="range"]{ width:100%; }
+.status{ margin-top:1rem; padding:1rem; border-radius:12px; background:#f7faff; border:1px solid #e5edff; }
+/* toggle switch */
+.switch{ position:relative; display:inline-block; width:52px; height:30px; }
+.switch input{ display:none; }
+.slider{ position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#d1d5db; transition:.2s; border-radius:999px; }
+.slider:before{ position:absolute; content:""; height:22px; width:22px; left:4px; top:4px; background:white; transition:.2s; border-radius:999px; }
+input:checked + .slider{ background:#34d399; }
+input:checked + .slider:before{ transform:translateX(22px); }

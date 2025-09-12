@@ -3,157 +3,53 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>TakunchanGarden - ระบบควบคุมรดน้ำ</title>
-
-  <!-- ฟอนต์ -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-  <!-- CSS -->
-  <style>
-    :root {
-      --bg:#0d1117;
-      --fg:#e6edf3;
-      --card-bg:#161b22;
-      --pri:#00eaff;
-      --pri-hover:#009dc4;
-      --success:#00ff6a;
-      --danger:#ff4c4c;
-    }
-    * { box-sizing:border-box; font-family: 'Poppins', sans-serif; }
-    body { margin:0; background:var(--bg); color:var(--fg); }
-
-    header { text-align:center; padding:3rem 1rem; position:relative; overflow:hidden; }
-    header::before {
-      content:""; position:absolute; top:0; left:0; right:0; bottom:0;
-      background:linear-gradient(270deg,#00eaff,#007bff,#28a745,#ff4c4c);
-      background-size:600% 600%; animation:gradientFlow 12s ease infinite; z-index:0;
-    }
-    header h1 {
-      margin:0; font-size:2.8rem; color:var(--pri);
-      font-family:'Orbitron',sans-serif; position:relative; z-index:1;
-      text-shadow:0 0 20px rgba(0,234,255,.8);
-    }
-    header p { margin:.5rem 0 0; opacity:.9; position:relative; z-index:1; }
-    @keyframes gradientFlow {
-      0%{background-position:0% 50%}
-      50%{background-position:100% 50%}
-      100%{background-position:0% 50%}
-    }
-
-    .container { max-width:950px; margin:2rem auto; padding:0 1rem; }
-    .card {
-      background:var(--card-bg); padding:1.5rem; border-radius:16px; margin-bottom:1.5rem;
-      box-shadow:0 0 15px rgba(0,234,255,.15); transition:transform .25s; position:relative; z-index:1;
-    }
-    .card:hover { transform:translateY(-3px); }
-
-    h2 { margin-top:0; color:var(--pri); font-family:'Orbitron',sans-serif; }
-    h3 { margin:1rem 0 .5rem; color:#ffd700; }
-    .row { display:flex; align-items:center; gap:12px; margin:10px 0; flex-wrap:wrap; }
-    .block { flex:1; }
-
-    .btn {
-      padding:.6rem 1.2rem; border:none; border-radius:10px;
-      font-weight:600; cursor:pointer; transition:all .25s;
-    }
-    .btn.blue { background:var(--pri); color:#fff; }
-    .btn.blue:hover { background:var(--pri-hover); }
-    .btn.green { background:var(--success); color:#000; box-shadow:0 0 8px var(--success); }
-    .btn.red { background:var(--danger); color:#fff; box-shadow:0 0 8px var(--danger); }
-    .btn.active { transform:scale(1.05); filter:brightness(1.3); }
-
-    .switch { position:relative; display:inline-block; width:52px; height:30px; }
-    .switch input { display:none; }
-    .slider {
-      position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0;
-      background:#555; transition:.25s; border-radius:999px;
-    }
-    .slider:before {
-      position:absolute; content:""; height:22px; width:22px; left:4px; top:4px;
-      background:white; transition:.25s; border-radius:999px;
-    }
-    input:checked + .slider { background:var(--success); }
-    input:checked + .slider:before { transform:translateX(22px); }
-
-    #ps.on { color:var(--success); text-shadow:0 0 8px var(--success); }
-    #ps.off { color:var(--danger); text-shadow:0 0 8px var(--danger); }
-
-    canvas { background:#fff; border-radius:12px; box-shadow:0 0 15px rgba(0,0,0,.6); padding:8px; }
-    .sub { font-size:.9rem; color:#aaa; }
-    .hidden { display:none; }
-  </style>
-
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <title>TalkBack Irrigation</title>
+  <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header>
-    <h1>🌱 TakunchanGarden</h1>
-    <p>ระบบควบคุมรดน้ำอัตโนมัติด้วย ESP32 + ThingSpeak TalkBack</p>
-  </header>
+<main class="card">
+  <h1>ควบคุมรดน้ำ (TalkBack)</h1>
 
-  <main class="container">
-    <section class="card">
-      <h2>⚙️ ควบคุมรดน้ำ</h2>
+  <section class="row">
+    <label class="switch">
+      <input id="modeToggle" type="checkbox"><span class="slider"></span>
+    </label>
+    <div>โหมด: <b id="modeLabel">AUTO</b></div>
+  </section>
+
+  <section id="manualRow" class="row hidden">
+    <button id="onBtn">เปิดปั๊ม</button>
+    <button id="offBtn" class="outline">ปิดปั๊ม</button>
+  </section>
+
+  <section class="row">
+    <div class="grow">
+      <label>Threshold</label>
       <div class="row">
-        <label class="switch">
-          <input id="modeToggle" type="checkbox"><span class="slider"></span>
-        </label>
-        <div>โหมด: <b id="modeLabel">AUTO</b></div>
+        <input id="thL" type="range" min="10" max="90" value="35"><span id="thLV">35%</span>
       </div>
-      <div id="manualRow" class="row hidden">
-        <button id="onBtn" class="btn green">🚰 เปิดปั๊ม</button>
-        <button id="offBtn" class="btn red">✖ ปิดปั๊ม</button>
+      <div class="row">
+        <input id="thH" type="range" min="10" max="90" value="45"><span id="thHV">45%</span>
       </div>
-      <div class="row space-between">
-        <div class="block">
-          <label>Threshold</label>
-          <div class="row">
-            <input id="thL" type="range" min="10" max="90" value="35">
-            <span id="thLV">35%</span>
-          </div>
-          <div class="row">
-            <input id="thH" type="range" min="10" max="90" value="45">
-            <span id="thHV">45%</span>
-          </div>
-          <button id="saveTh" class="btn blue">💾 บันทึก THRESH</button>
-        </div>
-        <div class="block">
-          <label>Max ON (min)</label>
-          <input id="maxOn" type="number" min="0" value="10" style="width:90px">
-          <button id="saveMax" class="btn blue">⏱ ตั้ง MAXON</button>
-        </div>
-      </div>
-    </section>
+      <button id="saveTh">บันทึก THRESH</button>
+    </div>
+    <div>
+      <label>Max ON (min)</label>
+      <input id="maxOn" type="number" min="0" value="10" style="width:90px">
+      <button id="saveMax">ตั้ง MAXON</button>
+    </div>
+  </section>
 
-    <section class="card">
-      <h2>📊 สถานะอุปกรณ์</h2>
-      <p>💧 ความชื้น: <b id="mo">-</b>%</p>
-      <p>🚰 ปั๊ม: <b id="ps" class="off">-</b></p>
-      <p>⚙️ โหมด (จากอุปกรณ์): <b id="md">-</b></p>
-      <p class="sub">🔄 อัปเดตทุก ~10 วินาที</p>
-    </section>
-
-    <section class="card">
-      <h2>📈 กราฟย้อนหลัง</h2>
-      <h3>💧 ความชื้น (%)</h3>
-      <canvas id="moistChart" height="200"></canvas>
-      <h3>🚰 ปั๊ม (ON/OFF)</h3>
-      <canvas id="pumpChart" height="200"></canvas>
-      <h3>⚙️ โหมด (AUTO/MANUAL)</h3>
-      <canvas id="modeChart" height="200"></canvas>
-    </section>
-  </main>
+  <section class="status">
+    <h2>สถานะ</h2>
+    <div>ความชื้น: <b id="mo">-</b>%</div>
+    <div>ปั๊ม: <b id="ps">-</b></div>
+    <div>โหมด (จากอุปกรณ์): <b id="md">-</b></div>
+    <div class="sub">อัปเดตทุก ~10 วินาที</div>
+  </section>
+</main>
 
 <script>
-/* ==== CONFIG ==== */
-const TALKBACK_ID = "55299";
-const TALKBACK_KEY = "SD4QR0KTHNL0MPKD";
-const CHANNEL_ID = "3069958";
-const RESULTS = 50;
-
-/* ==== DOM ==== */
 const modeToggle = document.getElementById('modeToggle');
 const manualRow  = document.getElementById('manualRow');
 const modeLabel  = document.getElementById('modeLabel');
@@ -166,6 +62,7 @@ const thHV = document.getElementById('thHV');
 const saveTh = document.getElementById('saveTh');
 const maxOn = document.getElementById('maxOn');
 const saveMax = document.getElementById('saveMax');
+
 const mo = document.getElementById('mo');
 const ps = document.getElementById('ps');
 const md = document.getElementById('md');
@@ -176,109 +73,38 @@ function applyMode(isAuto){
   modeToggle.checked = isAuto;
 }
 
-/* ==== ส่งคำสั่งไป TalkBack ==== */
 async function sendCmd(c){
-  const url = `https://api.thingspeak.com/talkbacks/${TALKBACK_ID}/commands?api_key=${TALKBACK_KEY}&command_string=${encodeURIComponent(c)}`;
-  try {
-    let res = await fetch(url, { method: "POST" });
-    if (res.ok) {
-      console.log("✅ ส่งคำสั่งสำเร็จ:", c);
-    } else {
-      console.error("❌ ส่งคำสั่งล้มเหลว");
-    }
-  } catch (err) { console.error("⚠️ Error:", err); }
+  await fetch('/api/cmd?c=' + encodeURIComponent(c));
 }
 
-/* ==== Event listeners ==== */
 modeToggle.addEventListener('change', async (e)=>{
   const isAuto = e.target.checked;
   await sendCmd('MODE:' + (isAuto ? 'AUTO' : 'MANUAL'));
   applyMode(isAuto);
 });
-onBtn.addEventListener('click', ()=> { sendCmd('PUMP:ON'); });
-offBtn.addEventListener('click', ()=> { sendCmd('PUMP:OFF'); });
+
+onBtn.addEventListener('click', ()=> sendCmd('PUMP:ON'));
+offBtn.addEventListener('click', ()=> sendCmd('PUMP:OFF'));
+
 thL.addEventListener('input', ()=> thLV.textContent = thL.value + '%');
 thH.addEventListener('input', ()=> thHV.textContent = thH.value + '%');
 saveTh.addEventListener('click', ()=> sendCmd(`THRESH:${thL.value}:${thH.value}`));
 saveMax.addEventListener('click', ()=> sendCmd(`MAXON:${maxOn.value}`));
 
-/* ==== โหลดสถานะล่าสุดจาก Channel ==== */
 async function loadStatus(){
   try{
-    const r = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&cache=${Date.now()}`);
-    const d = await r.json();
-    if (!d.feeds || d.feeds.length === 0) return;
-    const last = d.feeds[0];
-    if (last.field1) mo.textContent = parseFloat(last.field1).toFixed(1);
-    if (last.field2) {
-      const pump = parseInt(last.field2);
-      ps.textContent = pump ? 'ON' : 'OFF';
-      ps.className = pump ? 'on' : 'off';
-    }
-    if (last.field3) {
-      const isAuto = parseInt(last.field3) === 1;
+    const r = await fetch('/api/status');
+    const s = await r.json();
+    if (s.moisture_percent != null) mo.textContent = s.moisture_percent;
+    if (s.pump_state != null) ps.textContent = s.pump_state ? 'ON' : 'OFF';
+    if (s.mode != null){
+      const isAuto = Number(s.mode) === 1;
       md.textContent = isAuto ? 'AUTO' : 'MANUAL';
       applyMode(isAuto);
     }
-  }catch(e){ console.error(e); }
+  }catch(e){}
 }
 loadStatus(); setInterval(loadStatus, 10000);
-
-/* ==== กราฟ Chart.js ==== */
-const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${RESULTS}`;
-let moistChart, pumpChart, modeChart;
-
-async function loadHistory(){
-  try {
-    const r = await fetch(TS_URL + "&cache=" + Date.now());
-    const data = await r.json();
-    const labels = data.feeds.map(f => new Date(f.created_at));
-    const moist = data.feeds.map(f => parseFloat(f.field1));
-    const pump  = data.feeds.map(f => parseInt(f.field2));
-    const mode  = data.feeds.map(f => parseInt(f.field3));
-
-    // ความชื้น
-    const ctx1 = document.getElementById('moistChart').getContext('2d');
-    if(moistChart) moistChart.destroy();
-    moistChart = new Chart(ctx1,{
-      type:'line',
-      data:{ labels, datasets:[{ label:'💧 ความชื้น (%)', data:moist,
-        borderColor:'#007bff', pointBackgroundColor:'#007bff',
-        pointRadius:4, stepped:true, fill:false }]},
-      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#000' } } },
-        scales:{ x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
-          y:{ beginAtZero:true, max:100, ticks:{ color:'#333', stepSize:10 } } } }
-    });
-
-    // ปั๊ม
-    const ctx2 = document.getElementById('pumpChart').getContext('2d');
-    if(pumpChart) pumpChart.destroy();
-    pumpChart = new Chart(ctx2,{
-      type:'line',
-      data:{ labels, datasets:[{ label:'🚰 ปั๊ม (0=OFF, 1=ON)', data:pump,
-        borderColor:'#dc3545', pointBackgroundColor:'#dc3545',
-        pointRadius:5, stepped:true, fill:false }]},
-      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#000' } } },
-        scales:{ x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
-          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } } } }
-    });
-
-    // โหมด
-    const ctx3 = document.getElementById('modeChart').getContext('2d');
-    if(modeChart) modeChart.destroy();
-    modeChart = new Chart(ctx3,{
-      type:'line',
-      data:{ labels, datasets:[{ label:'⚙️ โหมด (0=MANUAL, 1=AUTO)', data:mode,
-        borderColor:'#28a745', pointBackgroundColor:'#28a745',
-        pointRadius:5, stepped:true, fill:false }]},
-      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#000' } } },
-        scales:{ x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
-          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } } } }
-    });
-
-  } catch (err) { console.error("โหลดข้อมูลกราฟผิดพลาด:", err); }
-}
-loadHistory(); setInterval(loadHistory, 15000);
 </script>
 </body>
 </html>
