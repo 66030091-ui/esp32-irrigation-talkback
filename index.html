@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>TakunchanGarden - ระบบควบคุมรดน้ำ</title>
 
-  <!-- ฟอนต์ทันสมัย -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- ฟอนต์ -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
   <!-- CSS -->
   <style>
@@ -23,17 +23,17 @@
     * { box-sizing:border-box; font-family: 'Poppins', sans-serif; }
     body { margin:0; background:var(--bg); color:var(--fg); }
 
-    header.header {
+    header {
       text-align:center;
       padding:2rem 1rem;
       background:linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       border-bottom:2px solid var(--pri);
       font-family:'Orbitron',sans-serif;
     }
-    header.header h1 { margin:0; color:var(--pri); font-size:2.2rem; }
-    header.header p { margin:.5rem 0 0; opacity:.8; }
+    header h1 { margin:0; color:var(--pri); font-size:2.4rem; }
+    header p { margin:.5rem 0 0; opacity:.8; }
 
-    .container { max-width:900px; margin:2rem auto; padding:0 1rem; }
+    .container { max-width:950px; margin:2rem auto; padding:0 1rem; }
     .card {
       background:var(--card-bg);
       padding:1.5rem;
@@ -47,7 +47,7 @@
     h2 { margin-top:0; color:var(--pri); font-family:'Orbitron',sans-serif; }
     h3 { margin:1rem 0 .5rem; color:#ffd700; }
 
-    .row { display:flex; align-items:center; gap:12px; margin:10px 0; }
+    .row { display:flex; align-items:center; gap:12px; margin:10px 0; flex-wrap:wrap; }
     .block { flex:1; }
 
     /* ปุ่ม */
@@ -88,6 +88,9 @@
       box-shadow:0 0 15px rgba(0,0,0,.6);
       padding:8px;
     }
+
+    .sub { font-size:.9rem; color:#aaa; }
+    .hidden { display:none; }
   </style>
 
   <!-- Chart.js -->
@@ -95,7 +98,7 @@
 </head>
 <body>
   <!-- Header -->
-  <header class="header">
+  <header>
     <h1>🌱 TakunchanGarden</h1>
     <p>ระบบควบคุมรดน้ำอัตโนมัติด้วย ESP32 + ThingSpeak TalkBack</p>
   </header>
@@ -110,9 +113,30 @@
         </label>
         <div>โหมด: <b id="modeLabel">AUTO</b></div>
       </div>
+
       <div id="manualRow" class="row hidden">
         <button id="onBtn" class="btn green">🚰 เปิดปั๊ม</button>
         <button id="offBtn" class="btn red">✖ ปิดปั๊ม</button>
+      </div>
+
+      <div class="row space-between">
+        <div class="block">
+          <label>Threshold</label>
+          <div class="row">
+            <input id="thL" type="range" min="10" max="90" value="35">
+            <span id="thLV">35%</span>
+          </div>
+          <div class="row">
+            <input id="thH" type="range" min="10" max="90" value="45">
+            <span id="thHV">45%</span>
+          </div>
+          <button id="saveTh" class="btn blue">💾 บันทึก THRESH</button>
+        </div>
+        <div class="block">
+          <label>Max ON (min)</label>
+          <input id="maxOn" type="number" min="0" value="10" style="width:90px">
+          <button id="saveMax" class="btn blue">⏱ ตั้ง MAXON</button>
+        </div>
       </div>
     </section>
 
@@ -138,17 +162,67 @@
   </main>
 
 <script>
-/* ==== ปุ่มควบคุม ==== */
+/* ==== ควบคุมโหมด ==== */
+const modeToggle = document.getElementById('modeToggle');
+const manualRow  = document.getElementById('manualRow');
+const modeLabel  = document.getElementById('modeLabel');
 const onBtn = document.getElementById('onBtn');
 const offBtn = document.getElementById('offBtn');
-function toggleButton(activeBtn, inactiveBtn){
-  activeBtn.classList.add('active');
-  inactiveBtn.classList.remove('active');
-}
-onBtn.addEventListener('click', ()=> toggleButton(onBtn, offBtn));
-offBtn.addEventListener('click', ()=> toggleButton(offBtn, onBtn));
+const thL = document.getElementById('thL');
+const thH = document.getElementById('thH');
+const thLV = document.getElementById('thLV');
+const thHV = document.getElementById('thHV');
+const saveTh = document.getElementById('saveTh');
+const maxOn = document.getElementById('maxOn');
+const saveMax = document.getElementById('saveMax');
+const mo = document.getElementById('mo');
+const ps = document.getElementById('ps');
+const md = document.getElementById('md');
 
-/* ==== Chart.js Logic ==== */
+function applyMode(isAuto){
+  modeLabel.textContent = isAuto ? 'AUTO' : 'MANUAL';
+  manualRow.classList.toggle('hidden', isAuto);
+  modeToggle.checked = isAuto;
+}
+
+async function sendCmd(c){
+  await fetch('/api/cmd?c=' + encodeURIComponent(c));
+}
+
+modeToggle.addEventListener('change', async (e)=>{
+  const isAuto = e.target.checked;
+  await sendCmd('MODE:' + (isAuto ? 'AUTO' : 'MANUAL'));
+  applyMode(isAuto);
+});
+
+onBtn.addEventListener('click', ()=> { sendCmd('PUMP:ON'); });
+offBtn.addEventListener('click', ()=> { sendCmd('PUMP:OFF'); });
+
+thL.addEventListener('input', ()=> thLV.textContent = thL.value + '%');
+thH.addEventListener('input', ()=> thHV.textContent = thH.value + '%');
+saveTh.addEventListener('click', ()=> sendCmd(`THRESH:${thL.value}:${thH.value}`));
+saveMax.addEventListener('click', ()=> sendCmd(`MAXON:${maxOn.value}`));
+
+/* ==== โหลดสถานะ ==== */
+async function loadStatus(){
+  try{
+    const r = await fetch('/api/status');
+    const s = await r.json();
+    if (s.moisture_percent != null) mo.textContent = s.moisture_percent;
+    if (s.pump_state != null) {
+      ps.textContent = s.pump_state ? 'ON' : 'OFF';
+      ps.className = s.pump_state ? 'on' : 'off';
+    }
+    if (s.mode != null){
+      const isAuto = Number(s.mode) === 1;
+      md.textContent = isAuto ? 'AUTO' : 'MANUAL';
+      applyMode(isAuto);
+    }
+  }catch(e){ console.error(e); }
+}
+loadStatus(); setInterval(loadStatus, 10000);
+
+/* ==== กราฟ Chart.js ==== */
 const CHANNEL_ID = "3069958";
 const RESULTS = 50;
 const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${RESULTS}`;
@@ -163,12 +237,11 @@ async function loadHistory(){
   const pump  = data.feeds.map(f => parseInt(f.field2));
   const mode  = data.feeds.map(f => parseInt(f.field3));
 
-  // Gradient สำหรับกราฟ
+  // กราฟความชื้น
   const ctx1 = document.getElementById('moistChart').getContext('2d');
   const gradMo = ctx1.createLinearGradient(0,0,0,200);
   gradMo.addColorStop(0,'rgba(0,234,255,0.7)');
   gradMo.addColorStop(1,'rgba(0,234,255,0.05)');
-
   if(moistChart) moistChart.destroy();
   moistChart = new Chart(ctx1,{
     type:'line',
@@ -176,6 +249,7 @@ async function loadHistory(){
     options:{ plugins:{legend:{labels:{color:'#fff'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'},beginAtZero:true,max:100}} }
   });
 
+  // กราฟปั๊ม
   const ctx2 = document.getElementById('pumpChart').getContext('2d');
   if(pumpChart) pumpChart.destroy();
   pumpChart = new Chart(ctx2,{
@@ -184,6 +258,7 @@ async function loadHistory(){
     options:{ plugins:{legend:{labels:{color:'#fff'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'},beginAtZero:true,max:1,ticks:{stepSize:1}}} }
   });
 
+  // กราฟโหมด
   const ctx3 = document.getElementById('modeChart').getContext('2d');
   if(modeChart) modeChart.destroy();
   modeChart = new Chart(ctx3,{
