@@ -19,40 +19,21 @@
       --success:#00ff6a;
       --danger:#ff4c4c;
     }
-
     * { box-sizing:border-box; font-family: 'Poppins', sans-serif; }
     body { margin:0; background:var(--bg); color:var(--fg); }
 
-    header {
-      text-align:center;
-      padding:3rem 1rem;
-      position:relative;
-      overflow:hidden;
-    }
+    header { text-align:center; padding:3rem 1rem; position:relative; overflow:hidden; }
     header::before {
-      content:"";
-      position:absolute;
-      top:0; left:0; right:0; bottom:0;
+      content:""; position:absolute; top:0; left:0; right:0; bottom:0;
       background:linear-gradient(270deg,#00eaff,#007bff,#28a745,#ff4c4c);
-      background-size:600% 600%;
-      animation:gradientFlow 12s ease infinite;
-      z-index:0;
+      background-size:600% 600%; animation:gradientFlow 12s ease infinite; z-index:0;
     }
     header h1 {
-      margin:0;
-      font-size:2.8rem;
-      color:var(--pri);
-      font-family:'Orbitron',sans-serif;
-      position:relative;
-      z-index:1;
+      margin:0; font-size:2.8rem; color:var(--pri);
+      font-family:'Orbitron',sans-serif; position:relative; z-index:1;
       text-shadow:0 0 20px rgba(0,234,255,.8);
     }
-    header p {
-      margin:.5rem 0 0;
-      opacity:.9;
-      position:relative;
-      z-index:1;
-    }
+    header p { margin:.5rem 0 0; opacity:.9; position:relative; z-index:1; }
     @keyframes gradientFlow {
       0%{background-position:0% 50%}
       50%{background-position:100% 50%}
@@ -61,29 +42,19 @@
 
     .container { max-width:950px; margin:2rem auto; padding:0 1rem; }
     .card {
-      background:var(--card-bg);
-      padding:1.5rem;
-      border-radius:16px;
-      margin-bottom:1.5rem;
-      box-shadow:0 0 15px rgba(0,234,255,.15);
-      transition:transform .25s;
-      position:relative;
-      z-index:1;
+      background:var(--card-bg); padding:1.5rem; border-radius:16px; margin-bottom:1.5rem;
+      box-shadow:0 0 15px rgba(0,234,255,.15); transition:transform .25s; position:relative; z-index:1;
     }
     .card:hover { transform:translateY(-3px); }
 
     h2 { margin-top:0; color:var(--pri); font-family:'Orbitron',sans-serif; }
     h3 { margin:1rem 0 .5rem; color:#ffd700; }
-
     .row { display:flex; align-items:center; gap:12px; margin:10px 0; flex-wrap:wrap; }
     .block { flex:1; }
 
-    /* ปุ่ม */
     .btn {
-      padding:.6rem 1.2rem;
-      border:none; border-radius:10px;
-      font-weight:600; cursor:pointer;
-      transition:all .25s;
+      padding:.6rem 1.2rem; border:none; border-radius:10px;
+      font-weight:600; cursor:pointer; transition:all .25s;
     }
     .btn.blue { background:var(--pri); color:#fff; }
     .btn.blue:hover { background:var(--pri-hover); }
@@ -91,7 +62,6 @@
     .btn.red { background:var(--danger); color:#fff; box-shadow:0 0 8px var(--danger); }
     .btn.active { transform:scale(1.05); filter:brightness(1.3); }
 
-    /* Switch */
     .switch { position:relative; display:inline-block; width:52px; height:30px; }
     .switch input { display:none; }
     .slider {
@@ -105,35 +75,25 @@
     input:checked + .slider { background:var(--success); }
     input:checked + .slider:before { transform:translateX(22px); }
 
-    /* สถานะ */
     #ps.on { color:var(--success); text-shadow:0 0 8px var(--success); }
     #ps.off { color:var(--danger); text-shadow:0 0 8px var(--danger); }
 
-    /* กราฟ */
-    canvas {
-      background:#fff;
-      border-radius:12px;
-      box-shadow:0 0 15px rgba(0,0,0,.6);
-      padding:8px;
-    }
-
+    canvas { background:#fff; border-radius:12px; box-shadow:0 0 15px rgba(0,0,0,.6); padding:8px; }
     .sub { font-size:.9rem; color:#aaa; }
     .hidden { display:none; }
   </style>
 
-  <!-- Chart.js + time scale -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body>
-  <!-- Header -->
   <header>
     <h1>🌱 TakunchanGarden</h1>
     <p>ระบบควบคุมรดน้ำอัตโนมัติด้วย ESP32 + ThingSpeak TalkBack</p>
   </header>
 
   <main class="container">
-    <!-- Control Card -->
     <section class="card">
       <h2>⚙️ ควบคุมรดน้ำ</h2>
       <div class="row">
@@ -142,12 +102,10 @@
         </label>
         <div>โหมด: <b id="modeLabel">AUTO</b></div>
       </div>
-
       <div id="manualRow" class="row hidden">
         <button id="onBtn" class="btn green">🚰 เปิดปั๊ม</button>
         <button id="offBtn" class="btn red">✖ ปิดปั๊ม</button>
       </div>
-
       <div class="row space-between">
         <div class="block">
           <label>Threshold</label>
@@ -169,7 +127,6 @@
       </div>
     </section>
 
-    <!-- Status Card -->
     <section class="card">
       <h2>📊 สถานะอุปกรณ์</h2>
       <p>💧 ความชื้น: <b id="mo">-</b>%</p>
@@ -178,7 +135,6 @@
       <p class="sub">🔄 อัปเดตทุก ~10 วินาที</p>
     </section>
 
-    <!-- Charts Card -->
     <section class="card">
       <h2>📈 กราฟย้อนหลัง</h2>
       <h3>💧 ความชื้น (%)</h3>
@@ -191,7 +147,13 @@
   </main>
 
 <script>
-/* ==== ควบคุมโหมด ==== */
+/* ==== CONFIG ==== */
+const TALKBACK_ID = "55299";
+const TALKBACK_KEY = "SD4QR0KTHNL0MPKD";
+const CHANNEL_ID = "3069958";
+const RESULTS = 50;
+
+/* ==== DOM ==== */
 const modeToggle = document.getElementById('modeToggle');
 const manualRow  = document.getElementById('manualRow');
 const modeLabel  = document.getElementById('modeLabel');
@@ -214,36 +176,47 @@ function applyMode(isAuto){
   modeToggle.checked = isAuto;
 }
 
+/* ==== ส่งคำสั่งไป TalkBack ==== */
 async function sendCmd(c){
-  await fetch('/api/cmd?c=' + encodeURIComponent(c));
+  const url = `https://api.thingspeak.com/talkbacks/${TALKBACK_ID}/commands?api_key=${TALKBACK_KEY}&command_string=${encodeURIComponent(c)}`;
+  try {
+    let res = await fetch(url, { method: "POST" });
+    if (res.ok) {
+      console.log("✅ ส่งคำสั่งสำเร็จ:", c);
+    } else {
+      console.error("❌ ส่งคำสั่งล้มเหลว");
+    }
+  } catch (err) { console.error("⚠️ Error:", err); }
 }
 
+/* ==== Event listeners ==== */
 modeToggle.addEventListener('change', async (e)=>{
   const isAuto = e.target.checked;
   await sendCmd('MODE:' + (isAuto ? 'AUTO' : 'MANUAL'));
   applyMode(isAuto);
 });
-
 onBtn.addEventListener('click', ()=> { sendCmd('PUMP:ON'); });
 offBtn.addEventListener('click', ()=> { sendCmd('PUMP:OFF'); });
-
 thL.addEventListener('input', ()=> thLV.textContent = thL.value + '%');
 thH.addEventListener('input', ()=> thHV.textContent = thH.value + '%');
 saveTh.addEventListener('click', ()=> sendCmd(`THRESH:${thL.value}:${thH.value}`));
 saveMax.addEventListener('click', ()=> sendCmd(`MAXON:${maxOn.value}`));
 
-/* ==== โหลดสถานะ ==== */
+/* ==== โหลดสถานะล่าสุดจาก Channel ==== */
 async function loadStatus(){
   try{
-    const r = await fetch('/api/status');
-    const s = await r.json();
-    if (s.moisture_percent != null) mo.textContent = s.moisture_percent;
-    if (s.pump_state != null) {
-      ps.textContent = s.pump_state ? 'ON' : 'OFF';
-      ps.className = s.pump_state ? 'on' : 'off';
+    const r = await fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=1&cache=${Date.now()}`);
+    const d = await r.json();
+    if (!d.feeds || d.feeds.length === 0) return;
+    const last = d.feeds[0];
+    if (last.field1) mo.textContent = parseFloat(last.field1).toFixed(1);
+    if (last.field2) {
+      const pump = parseInt(last.field2);
+      ps.textContent = pump ? 'ON' : 'OFF';
+      ps.className = pump ? 'on' : 'off';
     }
-    if (s.mode != null){
-      const isAuto = Number(s.mode) === 1;
+    if (last.field3) {
+      const isAuto = parseInt(last.field3) === 1;
       md.textContent = isAuto ? 'AUTO' : 'MANUAL';
       applyMode(isAuto);
     }
@@ -252,17 +225,13 @@ async function loadStatus(){
 loadStatus(); setInterval(loadStatus, 10000);
 
 /* ==== กราฟ Chart.js ==== */
-const CHANNEL_ID = "3069958";
-const RESULTS = 50;
 const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?results=${RESULTS}`;
-
 let moistChart, pumpChart, modeChart;
 
 async function loadHistory(){
   try {
-    const r = await fetch(TS_URL + "&cache=" + new Date().getTime());
+    const r = await fetch(TS_URL + "&cache=" + Date.now());
     const data = await r.json();
-
     const labels = data.feeds.map(f => new Date(f.created_at));
     const moist = data.feeds.map(f => parseFloat(f.field1));
     const pump  = data.feeds.map(f => parseInt(f.field2));
@@ -273,23 +242,12 @@ async function loadHistory(){
     if(moistChart) moistChart.destroy();
     moistChart = new Chart(ctx1,{
       type:'line',
-      data:{ labels, datasets:[{
-        label:'💧 ความชื้น (%)',
-        data:moist,
-        borderColor:'#007bff',
-        pointBackgroundColor:'#007bff',
-        pointRadius:4,
-        stepped:true,
-        fill:false
-      }]},
-      options:{
-        responsive:true,
-        plugins:{ legend:{ labels:{ color:'#000' } } },
-        scales:{
-          x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
-          y:{ beginAtZero:true, max:100, ticks:{ color:'#333', stepSize:10 } }
-        }
-      }
+      data:{ labels, datasets:[{ label:'💧 ความชื้น (%)', data:moist,
+        borderColor:'#007bff', pointBackgroundColor:'#007bff',
+        pointRadius:4, stepped:true, fill:false }]},
+      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#000' } } },
+        scales:{ x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
+          y:{ beginAtZero:true, max:100, ticks:{ color:'#333', stepSize:10 } } } }
     });
 
     // ปั๊ม
@@ -297,23 +255,12 @@ async function loadHistory(){
     if(pumpChart) pumpChart.destroy();
     pumpChart = new Chart(ctx2,{
       type:'line',
-      data:{ labels, datasets:[{
-        label:'🚰 ปั๊ม (0=OFF, 1=ON)',
-        data:pump,
-        borderColor:'#dc3545',
-        pointBackgroundColor:'#dc3545',
-        pointRadius:5,
-        stepped:true,
-        fill:false
-      }]},
-      options:{
-        responsive:true,
-        plugins:{ legend:{ labels:{ color:'#000' } } },
-        scales:{
-          x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
-          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } }
-        }
-      }
+      data:{ labels, datasets:[{ label:'🚰 ปั๊ม (0=OFF, 1=ON)', data:pump,
+        borderColor:'#dc3545', pointBackgroundColor:'#dc3545',
+        pointRadius:5, stepped:true, fill:false }]},
+      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#000' } } },
+        scales:{ x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
+          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } } } }
     });
 
     // โหมด
@@ -321,32 +268,17 @@ async function loadHistory(){
     if(modeChart) modeChart.destroy();
     modeChart = new Chart(ctx3,{
       type:'line',
-      data:{ labels, datasets:[{
-        label:'⚙️ โหมด (0=MANUAL, 1=AUTO)',
-        data:mode,
-        borderColor:'#28a745',
-        pointBackgroundColor:'#28a745',
-        pointRadius:5,
-        stepped:true,
-        fill:false
-      }]},
-      options:{
-        responsive:true,
-        plugins:{ legend:{ labels:{ color:'#000' } } },
-        scales:{
-          x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
-          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } }
-        }
-      }
+      data:{ labels, datasets:[{ label:'⚙️ โหมด (0=MANUAL, 1=AUTO)', data:mode,
+        borderColor:'#28a745', pointBackgroundColor:'#28a745',
+        pointRadius:5, stepped:true, fill:false }]},
+      options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#000' } } },
+        scales:{ x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
+          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } } } }
     });
 
-  } catch (err) {
-    console.error("โหลดข้อมูลกราฟผิดพลาด:", err);
-  }
+  } catch (err) { console.error("โหลดข้อมูลกราฟผิดพลาด:", err); }
 }
-
-loadHistory();
-setInterval(loadHistory, 15000);
+loadHistory(); setInterval(loadHistory, 15000);
 </script>
 </body>
 </html>
