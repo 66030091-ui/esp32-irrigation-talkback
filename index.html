@@ -83,7 +83,7 @@
 
     /* กราฟ */
     canvas {
-      background:#0d1117;
+      background:#fff;
       border-radius:12px;
       box-shadow:0 0 15px rgba(0,0,0,.6);
       padding:8px;
@@ -93,8 +93,9 @@
     .hidden { display:none; }
   </style>
 
-  <!-- Chart.js -->
+  <!-- Chart.js + time scale -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
 </head>
 <body>
   <!-- Header -->
@@ -230,45 +231,94 @@ const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?res
 let moistChart, pumpChart, modeChart;
 
 async function loadHistory(){
-  const r = await fetch(TS_URL);
-  const data = await r.json();
-  const labels = data.feeds.map(f => new Date(f.created_at).toLocaleTimeString());
-  const moist = data.feeds.map(f => parseFloat(f.field1));
-  const pump  = data.feeds.map(f => parseInt(f.field2));
-  const mode  = data.feeds.map(f => parseInt(f.field3));
+  try {
+    const r = await fetch(TS_URL);
+    const data = await r.json();
 
-  // กราฟความชื้น
-  const ctx1 = document.getElementById('moistChart').getContext('2d');
-  const gradMo = ctx1.createLinearGradient(0,0,0,200);
-  gradMo.addColorStop(0,'rgba(0,234,255,0.7)');
-  gradMo.addColorStop(1,'rgba(0,234,255,0.05)');
-  if(moistChart) moistChart.destroy();
-  moistChart = new Chart(ctx1,{
-    type:'line',
-    data:{ labels, datasets:[{ label:'💧 ความชื้น (%)', data:moist, borderColor:'#00eaff', backgroundColor:gradMo, fill:true, tension:0.3 }]},
-    options:{ plugins:{legend:{labels:{color:'#fff'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'},beginAtZero:true,max:100}} }
-  });
+    const labels = data.feeds.map(f => new Date(f.created_at));
+    const moist = data.feeds.map(f => parseFloat(f.field1));
+    const pump  = data.feeds.map(f => parseInt(f.field2));
+    const mode  = data.feeds.map(f => parseInt(f.field3));
 
-  // กราฟปั๊ม
-  const ctx2 = document.getElementById('pumpChart').getContext('2d');
-  if(pumpChart) pumpChart.destroy();
-  pumpChart = new Chart(ctx2,{
-    type:'line',
-    data:{ labels, datasets:[{ label:'🚰 ปั๊ม', data:pump, borderColor:'#ff4c4c', backgroundColor:'rgba(255,76,76,0.2)', stepped:true, fill:true }]},
-    options:{ plugins:{legend:{labels:{color:'#fff'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'},beginAtZero:true,max:1,ticks:{stepSize:1}}} }
-  });
+    // ความชื้น
+    const ctx1 = document.getElementById('moistChart').getContext('2d');
+    if(moistChart) moistChart.destroy();
+    moistChart = new Chart(ctx1,{
+      type:'line',
+      data:{ labels, datasets:[{
+        label:'💧 ความชื้น (%)',
+        data:moist,
+        borderColor:'#007bff',
+        backgroundColor:'rgba(0,123,255,0.1)',
+        pointBackgroundColor:'#007bff',
+        fill:true,
+        tension:0.2
+      }]},
+      options:{
+        responsive:true,
+        plugins:{ legend:{ labels:{ color:'#000' } } },
+        scales:{
+          x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
+          y:{ beginAtZero:true, max:100, ticks:{ color:'#333', stepSize:10 } }
+        }
+      }
+    });
 
-  // กราฟโหมด
-  const ctx3 = document.getElementById('modeChart').getContext('2d');
-  if(modeChart) modeChart.destroy();
-  modeChart = new Chart(ctx3,{
-    type:'line',
-    data:{ labels, datasets:[{ label:'⚙️ โหมด', data:mode, borderColor:'#00ff6a', backgroundColor:'rgba(0,255,106,0.2)', stepped:true, fill:true }]},
-    options:{ plugins:{legend:{labels:{color:'#fff'}}}, scales:{x:{ticks:{color:'#aaa'}},y:{ticks:{color:'#aaa'},beginAtZero:true,max:1,ticks:{stepSize:1}}} }
-  });
+    // ปั๊ม
+    const ctx2 = document.getElementById('pumpChart').getContext('2d');
+    if(pumpChart) pumpChart.destroy();
+    pumpChart = new Chart(ctx2,{
+      type:'line',
+      data:{ labels, datasets:[{
+        label:'🚰 ปั๊ม (0=OFF, 1=ON)',
+        data:pump,
+        borderColor:'#dc3545',
+        backgroundColor:'rgba(220,53,69,0.1)',
+        pointBackgroundColor:'#dc3545',
+        stepped:true,
+        fill:true
+      }]},
+      options:{
+        responsive:true,
+        plugins:{ legend:{ labels:{ color:'#000' } } },
+        scales:{
+          x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
+          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } }
+        }
+      }
+    });
+
+    // โหมด
+    const ctx3 = document.getElementById('modeChart').getContext('2d');
+    if(modeChart) modeChart.destroy();
+    modeChart = new Chart(ctx3,{
+      type:'line',
+      data:{ labels, datasets:[{
+        label:'⚙️ โหมด (0=MANUAL, 1=AUTO)',
+        data:mode,
+        borderColor:'#28a745',
+        backgroundColor:'rgba(40,167,69,0.1)',
+        pointBackgroundColor:'#28a745',
+        stepped:true,
+        fill:true
+      }]},
+      options:{
+        responsive:true,
+        plugins:{ legend:{ labels:{ color:'#000' } } },
+        scales:{
+          x:{ type:'time', time:{ unit:'minute' }, ticks:{ color:'#333' } },
+          y:{ min:0, max:1, ticks:{ color:'#333', stepSize:1 } }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("โหลดข้อมูลกราฟผิดพลาด:", err);
+  }
 }
+
 loadHistory();
-setInterval(loadHistory,30000);
+setInterval(loadHistory, 30000);
 </script>
 </body>
 </html>
