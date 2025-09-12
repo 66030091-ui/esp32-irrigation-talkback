@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>TalkBack Irrigation</title>
-  <link rel="stylesheet" href="/styles.css">
+  <!-- ✅ แก้ path CSS -->
+  <link rel="stylesheet" href="styles.css?v=3">
 </head>
 <body>
   <!-- Header -->
@@ -53,14 +54,14 @@
     <section class="card">
       <h2>สถานะอุปกรณ์</h2>
       <p>💧 ความชื้น: <b id="mo">-</b>%</p>
-      <p>🚰 ปั๊ม: <b id="ps">-</b></p>
+      <p>🚰 ปั๊ม: <b id="ps" class="off">-</b></p>
       <p>⚙️ โหมด (จากอุปกรณ์): <b id="md">-</b></p>
       <p class="sub">⏱ อัปเดตทุก ~10 วินาที</p>
     </section>
   </main>
 
 <script>
-/* ==== JS Logic เดิม (เก็บไว้) ==== */
+/* ==== JS Logic ==== */
 const modeToggle = document.getElementById('modeToggle');
 const manualRow  = document.getElementById('manualRow');
 const modeLabel  = document.getElementById('modeLabel');
@@ -107,7 +108,10 @@ async function loadStatus(){
     const r = await fetch('/api/status');
     const s = await r.json();
     if (s.moisture_percent != null) mo.textContent = s.moisture_percent;
-    if (s.pump_state != null) ps.textContent = s.pump_state ? 'ON' : 'OFF';
+    if (s.pump_state != null) {
+      ps.textContent = s.pump_state ? 'ON' : 'OFF';
+      ps.className = s.pump_state ? 'on' : 'off';  // ✅ สี ON/ OFF
+    }
     if (s.mode != null){
       const isAuto = Number(s.mode) === 1;
       md.textContent = isAuto ? 'AUTO' : 'MANUAL';
