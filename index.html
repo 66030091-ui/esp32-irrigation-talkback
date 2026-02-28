@@ -214,7 +214,7 @@
       <h3>💧 ความชื้น (%)</h3><canvas id="moistChart" height="200"></canvas>
       <h3>🚰 ปั๊ม (ON/OFF)</h3><canvas id="pumpChart" height="200"></canvas>
       <h3>⚙️ โหมด (AUTO/MANUAL)</h3><canvas id="modeChart" height="200"></canvas>
-      <h3>🧪 3 Sensor</h3><canvas id="npkChart" height="200"></canvas>
+      <h3>🧪 ปุ๋ย NPK (mg/kg)</h3><canvas id="npkChart" height="200"></canvas>
     </section>
   </main>
 
@@ -354,9 +354,9 @@ async function loadHistory(){
       data:{
         labels,
         datasets:[
-          {label:'Rain Sensor(%)', data:nData, borderColor:'#ffb020', pointBackgroundColor:'#ffb020', pointRadius:3, fill:false},
-          {label:'Temperature(องศา)', data:pData, borderColor:'#b277ff', pointBackgroundColor:'#b277ff', pointRadius:3, fill:false},
-          {label:'Humidity(%)', data:kData, borderColor:'#00ff6a', pointBackgroundColor:'#00ff6a', pointRadius:3, fill:false},
+          {label:'N (mg/kg)', data:nData, borderColor:'#ffb020', pointBackgroundColor:'#ffb020', pointRadius:3, fill:false},
+          {label:'P (mg/kg)', data:pData, borderColor:'#b277ff', pointBackgroundColor:'#b277ff', pointRadius:3, fill:false},
+          {label:'K (mg/kg)', data:kData, borderColor:'#00ff6a', pointBackgroundColor:'#00ff6a', pointRadius:3, fill:false},
         ]
       },
       options:{
